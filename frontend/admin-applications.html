@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applicants</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+.input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="fixed top-0 w-full bg-white shadow-sm z-40 px-4 sm:px-6 py-4 flex items-center justify-between">
+
+  <div class="flex items-center gap-3">
+    <button onclick="history.back()"
+      class="text-blue-600 text-xl hover:bg-blue-50 p-2 rounded-lg">
+      ←
+    </button>
+
+
+<h1 class="text-lg sm:text-xl font-bold text-gray-800">
+  Applicants
+</h1>
+
+
+  </div>
+
+<button onclick="downloadExcel()"
+ class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm sm:text-base hover:bg-green-700 transition">
+Download Excel </button>
+
+</header>
+
+<!-- MAIN -->
+
+<main class="pt-24 pb-16 px-4 sm:px-6 max-w-5xl mx-auto">
+
+  <!-- COUNT CARD -->
+
+  <div class="bg-white p-4 rounded-xl shadow mb-6 flex justify-between items-center">
+    <p class="text-gray-600 text-sm sm:text-base">
+      Total Applicants
+    </p>
+
+
+<span id="count"
+  class="text-xl font-bold text-blue-600">
+  0
+</span>
+
+
+  </div>
+
+  <!-- LIST -->
+
+  <div id="applicantsContainer" class="space-y-4"></div>
+
+</main>
+
+<script>
+
+const jobId = new URLSearchParams(window.location.search).get("job_id");
+
+async function loadApplicants() {
+
+  const res = await fetch(`http://127.0.0.1:8000/applications/${jobId}`);
+  const data = await res.json();
+
+  document.getElementById("count").innerText = data.length;
+
+  const container = document.getElementById("applicantsContainer");
+  container.innerHTML = "";
+
+  if (data.length === 0) {
+    container.innerHTML = `
+      <div class="text-center text-gray-500 mt-10">
+        No applicants yet
+      </div>
+    `;
+    return;
+  }
+
+  data.forEach(a => {
+
+    const div = document.createElement("div");
+
+    div.className = "bg-white p-5 rounded-xl shadow hover:shadow-md transition flex flex-col sm:flex-row sm:justify-between gap-4";
+
+    div.innerHTML = `
+      <div>
+        <h3 class="font-bold text-lg text-gray-800">${a.student_name}</h3>
+        <p class="text-sm text-gray-500">${a.email}</p>
+        <p class="text-sm text-gray-500">${a.phone}</p>
+        <p class="text-sm text-gray-600 mt-1">CGPA: ${a.cgpa}</p>
+      </div>
+
+      <div class="flex items-center sm:items-end">
+        <a href="${a.resume_link}" target="_blank"
+          class="text-blue-600 font-medium text-sm hover:underline">
+          View Resume →
+        </a>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function downloadExcel() {
+  window.open(`http://127.0.0.1:8000/applications/export/${jobId}`);
+}
+
+loadApplicants();
+</script>
+
+</body>
+</html>

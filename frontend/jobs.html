@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Job Listings | The SCIS placements</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* NAV */
+.nav-link {
+  color: #64748b;
+  transition: 0.3s;
+}
+.nav-link:hover {
+  color: #2563eb;
+}
+.nav-active {
+  color: #2563eb !important;
+  border-bottom: 2px solid #2563eb;
+}
+
+/* CARD */
+.job-card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid #f1f5f9;
+  transition: 0.25s;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- NAVBAR -->
+
+<nav class="fixed top-0 w-full z-50 bg-white shadow-sm">
+  <div class="flex justify-between items-center px-4 sm:px-8 py-4 max-w-7xl mx-auto">
+
+
+<div class="flex items-center gap-2">
+  <span class="material-symbols-outlined text-blue-600">account_balance</span>
+  <span class="text-lg font-bold text-blue-600">
+    SCIS placements
+  </span>
+</div>
+
+<div class="hidden md:flex items-center gap-8">
+  <a id="nav-home" href="home.html" class="nav-link font-semibold">Home</a>
+  <a id="nav-jobs" href="jobs.html" class="nav-link font-semibold">Jobs & Company</a>
+  <a id="nav-alumni" href="alumni.html" class="nav-link font-semibold">Alumni</a>
+</div>
+
+
+  </div>
+</nav>
+
+<!-- MAIN -->
+
+<main class="pt-24 pb-28 px-4 sm:px-6 max-w-5xl mx-auto">
+
+<!-- HEADER -->
+
+<section class="mb-10">
+  <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-2">
+    Opportunities
+  </h2>
+  <p class="text-gray-500 text-sm sm:text-base max-w-xl">
+    Discover curated positions designed for the next generation of industry leaders.
+  </p>
+
+  <!-- SEARCH -->
+
+  <div class="relative mt-6">
+    <span class="material-symbols-outlined absolute left-4 top-3 text-gray-400">
+      search
+    </span>
+
+
+<input id="searchInput"
+  class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+  placeholder="Search roles, companies..." />
+
+
+  </div>
+
+</section>
+
+<!-- JOB LIST -->
+
+<div id="jobsContainer" class="space-y-5"></div>
+
+</main>
+
+<script>
+
+let allJobs = [];
+
+async function loadJobs() {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/jobs");
+    const jobs = await res.json();
+
+    allJobs = jobs;
+    displayJobs(jobs);
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+function displayJobs(jobs) {
+  const container = document.getElementById("jobsContainer");
+  container.innerHTML = "";
+
+  if (jobs.length === 0) {
+    container.innerHTML = "<p class='text-center text-gray-500'>No jobs available</p>";
+    return;
+  }
+
+  jobs.forEach(job => {
+
+    const initials = job.company_name
+      .split(" ")
+      .map(w => w[0])
+      .join("")
+      .toUpperCase();
+
+    const div = document.createElement("div");
+
+    div.onclick = () => openJob(job.id);
+
+    div.className = "job-card flex flex-col sm:flex-row justify-between gap-5";
+
+    div.innerHTML = `
+      <div class="flex gap-4">
+
+        <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+          ${initials}
+        </div>
+
+        <div>
+          <h3 class="text-lg sm:text-xl font-bold text-gray-800">${job.job_role}</h3>
+          <p class="text-gray-500 text-sm">${job.company_name}</p>
+
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="bg-blue-50 text-blue-600 text-xs px-3 py-1 rounded-full">
+              ${job.industry}
+            </span>
+
+            <span class="bg-green-50 text-green-600 text-xs px-3 py-1 rounded-full">
+              ${job.salary_lpa} LPA
+            </span>
+
+            <span class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+              Deadline: ${job.deadline}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col items-end justify-between">
+
+        <button onclick='event.stopPropagation(); handleApply(${JSON.stringify(job)})'
+          class="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
+          Apply
+        </button>
+
+        <span class="text-xs text-green-600 font-semibold">
+          ● Active
+        </span>
+
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+loadJobs();
+
+document.getElementById("searchInput").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+
+  const filtered = allJobs.filter(job =>
+    job.job_role.toLowerCase().includes(value) ||
+    job.company_name.toLowerCase().includes(value)
+  );
+
+  displayJobs(filtered);
+});
+
+function handleApply(job){
+  if(job.application_type === "external"){
+    window.open(job.apply_url, "_blank");
+  } else {
+    window.location.href = `student_apply.html?job_id=${job.id}`;
+  }
+}
+
+function openJob(jobId){
+  window.location.href = `job-details.html?job_id=${jobId}`;
+}
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const path = window.location.pathname.split("/").pop();
+
+  if (path === "home.html") {
+    document.getElementById("nav-home")?.classList.add("nav-active");
+  }
+  else if (path === "jobs.html") {
+    document.getElementById("nav-jobs")?.classList.add("nav-active");
+  }
+  else if (path === "alumni.html") {
+    document.getElementById("nav-alumni")?.classList.add("nav-active");
+  }
+
+});
+</script>
+
+</body>
+</html>

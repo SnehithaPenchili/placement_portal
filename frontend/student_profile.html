@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Profile</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* CARD */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+/* CHIP */
+.chip {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="sticky top-0 bg-white shadow-sm px-4 sm:px-6 py-4 flex items-center gap-3 z-50">
+  <button onclick="history.back()" class="text-blue-600 text-xl hover:bg-blue-50 p-2 rounded-lg">
+    ←
+  </button>
+  <h1 class="font-bold text-lg text-blue-600">Student Profile</h1>
+</header>
+
+<!-- MAIN -->
+
+<main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+<!-- PROFILE TOP -->
+
+<div class="card flex flex-col sm:flex-row items-center gap-6">
+
+<img id="profile_img"
+ class="w-24 h-24 rounded-xl object-cover border"
+ src="https://via.placeholder.com/100">
+
+  <div class="flex-1 text-center sm:text-left">
+    <h2 id="name" class="text-2xl sm:text-3xl font-extrabold text-gray-800">
+      Loading...
+    </h2>
+
+
+<p class="text-gray-500 mt-1">
+  🎓 <span id="university">-</span>
+</p>
+
+<p class="text-gray-500">
+  📍 <span id="address">-</span>
+</p>
+
+
+  </div>
+
+</div>
+
+<!-- ACADEMIC -->
+
+<div class="card">
+  <h3 class="font-bold text-lg mb-4">Academic Info</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+
+
+<p><b>Degree:</b> <span id="degree">-</span></p>
+<p><b>CGPA:</b> <span id="cgpa">-</span></p>
+<p><b>Graduation:</b> <span id="grad">-</span></p>
+<p><b>Specialization:</b> <span id="spec">-</span></p>
+
+
+  </div>
+
+  <p class="mt-4 text-sm">
+    <b>Coursework:</b> <span id="course">-</span>
+  </p>
+</div>
+
+<!-- SKILLS -->
+
+<div class="card">
+  <h3 class="font-bold text-lg mb-4">Skills</h3>
+  <div id="skills" class="flex flex-wrap gap-2"></div>
+</div>
+
+<!-- EXPERIENCE -->
+
+<div class="card">
+  <h3 class="font-bold text-lg mb-4">Experience</h3>
+  <div id="experience" class="space-y-2"></div>
+</div>
+
+<!-- PROJECTS -->
+
+<div class="card">
+  <h3 class="font-bold text-lg mb-4">Projects</h3>
+  <div id="projects" class="space-y-2"></div>
+</div>
+
+<!-- CONTACT -->
+
+<div class="card">
+  <h3 class="font-bold text-lg mb-4">Contact</h3>
+
+  <div class="space-y-2 text-sm">
+    <p><b>Email:</b> <span id="email">-</span></p>
+    <p><b>Phone:</b> <span id="phone">-</span></p>
+    <p><b>LinkedIn:</b> <span id="linkedin">-</span></p>
+  </div>
+</div>
+
+<!-- RESUME -->
+
+<div class="card text-center">
+  <h3 class="font-bold text-lg mb-4">Resume</h3>
+
+<a id="resume" target="_blank"
+ class="bg-blue-600 text-white px-6 py-2 rounded-lg inline-block hover:bg-blue-700 transition">
+View Resume </a>
+
+</div>
+
+</main>
+
+<!-- YOUR ORIGINAL SCRIPT (UNCHANGED) -->
+
+<script>
+const userId = localStorage.getItem("user_id");
+
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.innerText = value || "-";
+}
+
+async function loadProfile(){
+
+  if(!userId){
+    alert("Login required");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const res = await fetch(`http://127.0.0.1:8000/profile/${userId}`);
+  const data = await res.json();
+
+  console.log("PROFILE:", data);
+
+  if(!data || Object.keys(data).length === 0){
+    window.location.href = "create-profile.html";
+    return;
+  }
+
+  setText("name", data.full_name);
+  setText("email", data.email);
+  setText("university", data.university);
+  setText("address", data.address);
+
+  setText("degree", data.degree);
+  setText("cgpa", data.cgpa);
+  setText("grad", data.graduation_year);
+  setText("spec", data.specialization);
+  setText("course", data.coursework);
+
+  setText("phone", data.phone);
+  setText("linkedin", data.linkedin);
+
+  if (data.profile_image) {
+    document.getElementById("profile_img").src = data.profile_image;
+  }
+
+  if(data.resume_url){
+    document.getElementById("resume").href = data.resume_url;
+  }
+
+  let skillsHTML = "";
+  if(data.skills){
+    data.skills.split(",").forEach(skill=>{
+      skillsHTML += `<span class="chip">${skill}</span>`;
+    });
+  }
+  document.getElementById("skills").innerHTML = skillsHTML;
+
+  let expHTML = "";
+  try{
+    const exp = JSON.parse(data.experience || "[]");
+    exp.forEach(e=>{
+      expHTML += `<div class="bg-gray-100 p-2 rounded">${e}</div>`;
+    });
+  }catch{}
+  document.getElementById("experience").innerHTML = expHTML;
+
+  let projHTML = "";
+  try{
+    const proj = JSON.parse(data.projects || "[]");
+    proj.forEach(p=>{
+      projHTML += `<div class="bg-gray-100 p-2 rounded">${p}</div>`;
+    });
+  }catch{}
+  document.getElementById("projects").innerHTML = projHTML;
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

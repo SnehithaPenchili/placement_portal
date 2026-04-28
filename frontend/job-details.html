@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Details</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Reusable card */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="flex items-center gap-4 px-4 sm:px-6 py-4 bg-white shadow-sm sticky top-0 z-50">
+
+  <button onclick="goBack()" class="text-blue-600 text-xl hover:bg-blue-50 p-2 rounded-lg">
+    ←
+  </button>
+
+  <h1 class="font-bold text-lg text-blue-700">
+    Placement Portal
+  </h1>
+
+</header>
+
+<!-- CONTENT -->
+
+<main class="max-w-3xl mx-auto p-4 sm:p-6 space-y-6">
+
+  <!-- TITLE -->
+
+  <div class="space-y-2">
+    <p class="text-green-600 text-sm font-semibold">
+      FULL-TIME PLACEMENT
+    </p>
+
+
+<h1 id="role" class="text-2xl sm:text-3xl font-extrabold text-gray-800"></h1>
+
+<p id="company" class="text-gray-600"></p>
+<p id="location" class="text-gray-400 text-sm"></p>
+
+
+  </div>
+
+  <!-- COMPANY -->
+
+  <div class="card">
+    <h2 class="font-semibold text-lg mb-2">About Company</h2>
+    <p id="about" class="text-gray-600 text-sm leading-relaxed"></p>
+  </div>
+
+  <!-- DESCRIPTION -->
+
+  <div class="card">
+    <h2 class="font-semibold text-lg mb-3 border-l-4 border-blue-600 pl-3">
+      Job Description
+    </h2>
+    <p id="description" class="text-gray-600 text-sm leading-relaxed"></p>
+  </div>
+
+  <!-- REQUIREMENTS -->
+
+  <div class="card">
+    <h2 class="font-semibold text-lg mb-3 border-l-4 border-blue-600 pl-3">
+      Requirements
+    </h2>
+    <p id="requirements" class="text-gray-600 text-sm leading-relaxed"></p>
+  </div>
+
+  <!-- BENEFITS -->
+
+  <div class="bg-blue-50 p-5 rounded-xl">
+    <h2 class="font-semibold text-blue-700 mb-3">Benefits</h2>
+
+
+<div class="flex flex-wrap gap-2">
+  <span class="bg-white px-3 py-1 rounded-full text-sm shadow-sm">Flexible Work</span>
+  <span class="bg-white px-3 py-1 rounded-full text-sm shadow-sm">Stipend</span>
+  <span class="bg-white px-3 py-1 rounded-full text-sm shadow-sm">Mentorship</span>
+</div>
+
+
+  </div>
+
+  <!-- DEADLINE -->
+
+  <div class="card flex justify-between items-center">
+    <div>
+      <p class="text-gray-500 text-sm">Application Deadline</p>
+      <p id="deadline" class="font-semibold text-gray-700"></p>
+    </div>
+
+
+<span class="text-xs text-gray-400">Apply soon</span>
+
+
+  </div>
+
+  <!-- APPLY BUTTON -->
+
+<button onclick="applyJob()" 
+ class="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-4 rounded-xl font-bold text-lg hover:scale-[0.99] transition">
+Apply Now → </button>
+
+</main>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const jobId = params.get("job_id");
+
+let jobData = null;
+
+async function loadJob() {
+  const res = await fetch("http://127.0.0.1:8000/jobs");
+  const jobs = await res.json();
+
+  jobData = jobs.find(j => j.id === jobId);
+
+  if (!jobData) return;
+
+  document.getElementById("role").innerText = jobData.job_role;
+  document.getElementById("company").innerText = jobData.company_name;
+  document.getElementById("location").innerText = jobData.industry;
+
+  document.getElementById("about").innerText = jobData.description;
+  document.getElementById("description").innerText = jobData.description;
+  document.getElementById("requirements").innerText = jobData.eligibility;
+  document.getElementById("deadline").innerText = jobData.deadline;
+}
+
+function applyJob(){
+  if(jobData.application_type === "external"){
+    window.open(jobData.apply_url, "_blank");
+  } else {
+    window.location.href = `student_apply.html?job_id=${jobData.id}`;
+  }
+}
+
+function goBack(){
+  window.location.href = "jobs.html";
+}
+
+loadJob();
+
+</script>
+
+</body>
+</html>

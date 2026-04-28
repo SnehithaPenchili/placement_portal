@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Add/Edit Job Opportunity</title>
+
+<!-- Tailwind -->
+
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+<!-- Fonts -->
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-headline {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Input style */
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  outline: none;
+  transition: 0.2s;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+/* Label */
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="fixed top-0 w-full z-40 bg-white/80 backdrop-blur shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between">
+
+  <div class="flex items-center gap-4">
+    <a href="dashboard.html">
+      <span class="material-symbols-outlined text-blue-600 p-2 rounded-xl hover:bg-blue-50 cursor-pointer">
+        arrow_back
+      </span>
+    </a>
+
+
+<div class="flex items-center gap-2">
+  <span class="material-symbols-outlined text-blue-600">analytics</span>
+  <h1 class="text-lg sm:text-xl font-extrabold text-blue-600 font-headline">
+    Placement Intelligence
+  </h1>
+</div>
+
+
+  </div>
+
+</header>
+
+<!-- MAIN -->
+
+<main class="pt-24 pb-20 px-4 sm:px-6 max-w-5xl mx-auto">
+
+<!-- TITLE -->
+
+<div class="mb-8 text-center md:text-left">
+  <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">
+    Curate Opportunity
+  </h2>
+  <p class="text-gray-500 text-sm sm:text-base mt-1">
+    Create and manage job opportunities for students
+  </p>
+</div>
+
+<!-- FORM -->
+
+<form id="jobForm" class="space-y-8">
+
+<!-- CORE DETAILS -->
+
+<div class="bg-white p-6 sm:p-8 rounded-2xl shadow">
+
+  <h3 class="text-lg sm:text-xl font-bold mb-6">Core Details</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+
+<div>
+  <label class="label">Company Name</label>
+  <input id="company" type="text" placeholder="Google" class="input"/>
+</div>
+
+<div>
+  <label class="label">Job Role</label>
+  <input id="role" type="text" placeholder="Software Engineer" class="input"/>
+</div>
+
+<div>
+  <label class="label">Industry</label>
+  <select id="industry" class="input">
+    <option>Information Technology</option>
+    <option>Finance</option>
+    <option>Healthcare</option>
+    <option>Artificial Intelligence</option>
+    <option>Computer Science</option>
+  </select>
+</div>
+
+<div>
+  <label class="label">Salary (LPA)</label>
+  <input id="salary" type="number" placeholder="12" class="input"/>
+</div>
+
+<div class="sm:col-span-2">
+  <label class="label">Deadline</label>
+  <input id="deadline" type="date" class="input"/>
+</div>
+
+<div class="sm:col-span-2">
+  <label class="label">Application Type</label>
+  <select id="application_type" class="input">
+    <option value="internal">On-Campus (Collect Data)</option>
+    <option value="external">External (Company Website)</option>
+  </select>
+</div>
+
+
+  </div>
+</div>
+
+<!-- JOB DETAILS -->
+
+<div class="bg-white p-6 sm:p-8 rounded-2xl shadow">
+
+  <h3 class="text-lg sm:text-xl font-bold mb-6">Job Details</h3>
+
+  <div class="space-y-5">
+
+
+<textarea id="description" rows="4"
+  placeholder="Describe job responsibilities..."
+  class="input"></textarea>
+
+<textarea id="eligibility" rows="3"
+  placeholder="Eligibility criteria..."
+  class="input"></textarea>
+
+<div id="applyUrlField" class="hidden">
+  <input id="apply_url" type="url"
+    placeholder="Company Application Link"
+    class="input"/>
+</div>
+
+
+  </div>
+</div>
+
+<!-- BUTTON -->
+
+<div class="text-center">
+  <button type="submit"
+    class="w-full sm:w-auto px-10 py-3 rounded-xl text-white font-semibold
+    bg-gradient-to-r from-blue-600 to-blue-400
+    hover:scale-[0.98] transition">
+    Publish Opportunity
+  </button>
+</div>
+
+</form>
+</main>
+
+<!-- SCRIPT (UNCHANGED LOGIC) -->
+
+<script>
+
+const form = document.querySelector("form");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    company_name: document.getElementById("company").value,
+    job_role: document.getElementById("role").value,
+    industry: document.getElementById("industry").value,
+    salary_lpa: document.getElementById("salary").value,
+    deadline: document.getElementById("deadline").value,
+    description: document.getElementById("description").value,
+    eligibility: document.getElementById("eligibility").value,
+    apply_url: document.getElementById("apply_url").value,
+    application_type: document.getElementById("application_type").value
+  };
+
+  console.log("Sending:", data);
+
+  const res = await fetch("http://127.0.0.1:8000/jobs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  if (result.message) {
+    alert("Job added successfully!");
+    form.reset();
+  } else {
+    alert("Error: " + result.error);
+  }
+});
+
+document.getElementById("application_type").addEventListener("change", function(){
+  const type = this.value;
+
+  if(type === "external"){
+    document.getElementById("applyUrlField").classList.remove("hidden");
+  } else {
+    document.getElementById("applyUrlField").classList.add("hidden");
+  }
+});
+
+</script>
+
+</body>
+</html>

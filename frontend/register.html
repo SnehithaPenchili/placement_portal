@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register | SCIS placements</title>
+
+<!-- Fonts -->
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Tailwind -->
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-headline {
+  font-family: 'Manrope', sans-serif;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #005bbf, #1a73e8);
+}
+
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.9);
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<!-- HEADER -->
+
+<header class="w-full bg-white shadow-sm">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-2">
+    <span class="text-blue-600 text-xl">🎓</span>
+    <h1 class="text-blue-700 font-bold text-lg font-headline">
+      SCIS placements
+    </h1>
+  </div>
+</header>
+
+<!-- MAIN -->
+
+<main class="flex-grow flex items-center justify-center px-4 sm:px-6 py-10 relative">
+
+  <!-- Background -->
+
+  <div class="absolute w-72 h-72 bg-blue-200 rounded-full blur-3xl opacity-20 top-[-50px] right-[-50px]"></div>
+  <div class="absolute w-72 h-72 bg-green-200 rounded-full blur-3xl opacity-20 bottom-[-50px] left-[-50px]"></div>
+
+  <!-- CARD -->
+
+  <div class="w-full max-w-xl glass rounded-2xl shadow-lg p-6 sm:p-8 z-10">
+
+
+<!-- TITLE -->
+<div class="mb-6">
+  <h2 class="text-2xl sm:text-3xl font-bold font-headline text-gray-800">
+    Create Account
+  </h2>
+  <p class="text-gray-500 text-sm mt-1">
+    Start your placement journey
+  </p>
+</div>
+
+<!-- FORM -->
+<form id="registerForm" class="space-y-4">
+
+  <input id="name" type="text" placeholder="Full Name"
+    class="input" required>
+
+  <input id="email" type="email" placeholder="Email"
+    class="input" required>
+
+  <input id="college" type="text" placeholder="College"
+    class="input" required>
+
+  <input id="password" type="password" placeholder="Password"
+    class="input" required>
+
+  <input id="confirm_password" type="password" placeholder="Confirm Password"
+    class="input" required>
+
+  <button type="submit"
+    class="w-full btn-gradient text-white py-3 rounded-lg font-semibold shadow hover:scale-[0.98] transition">
+    Create Account
+  </button>
+
+</form>
+
+<!-- LOGIN LINK -->
+<p class="mt-6 text-center text-sm text-gray-500">
+  Already have an account?
+  <a href="login.html" class="text-blue-600 font-semibold hover:underline">
+    Login
+  </a>
+</p>
+
+
+  </div>
+</main>
+
+<!-- INPUT STYLE -->
+
+<style>
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  outline: none;
+  transition: 0.2s;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+</style>
+
+<!-- SCRIPT (UNCHANGED LOGIC) -->
+
+<script>
+const form = document.getElementById("registerForm");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const full_name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const college = document.getElementById("college").value;
+  const password = document.getElementById("password").value;
+  const confirm_password = document.getElementById("confirm_password").value;
+
+  if (password !== confirm_password) {
+    alert("Passwords do not match ");
+    return;
+  }
+
+  if (!email.endsWith("@uohyd.ac.in")) {
+    alert("Use your institutional email only");
+    return;
+  }
+
+  const data = {
+    full_name,
+    email,
+    college,
+    password
+  };
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      alert("Registered successfully 🎉");
+      window.location.href = "login.html";
+    } else {
+      alert("Error: " + result.error);
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Server error ");
+  }
+});
+</script>
+
+</body>
+</html>

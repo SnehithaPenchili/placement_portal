@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Placement Tracker</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+body { font-family: 'Plus Jakarta Sans', sans-serif; }
+h1,h2 { font-family: 'Manrope', sans-serif; }
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="fixed top-0 w-full z-40 bg-white shadow-sm px-4 sm:px-6 py-4 flex justify-between items-center">
+
+  <div class="flex items-center gap-4">
+    <a href="dashboard.html">
+      <span class="material-symbols-outlined text-blue-600 p-2 rounded-lg hover:bg-blue-50">
+        arrow_back
+      </span>
+    </a>
+
+
+<div class="flex items-center gap-2">
+  <span class="material-symbols-outlined text-blue-600">analytics</span>
+  <h1 class="text-lg sm:text-xl font-bold text-blue-600">
+    Placement Intelligence
+  </h1>
+</div>
+
+
+  </div>
+
+</header>
+
+<!-- MAIN -->
+
+<main class="pt-24 pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
+
+<!-- TITLE -->
+
+<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+
+  <div>
+    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800">
+      Student Placement Tracker
+    </h2>
+    <p class="text-gray-500 text-sm sm:text-base">
+      Manage and monitor student placements
+    </p>
+  </div>
+
+  <div class="flex gap-3">
+    <button onclick="downloadReport()"
+      class="bg-gray-200 px-5 py-3 rounded-xl font-semibold flex items-center gap-2 hover:bg-gray-300">
+      <span class="material-symbols-outlined">file_download</span>
+      Export
+    </button>
+
+
+<a href="add-pstudent.html">
+  <button class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-700">
+    <span class="material-symbols-outlined">add</span>
+    New Placement
+  </button>
+</a>
+
+
+  </div>
+
+</div>
+
+<!-- STATS -->
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-gray-500 text-sm">Total Placed</p>
+    <p id="totalPlaced" class="text-3xl font-bold text-blue-600">0</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-gray-500 text-sm">Avg Package</p>
+    <p class="text-3xl font-bold text-green-600">0 LPA</p>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <p class="text-gray-500 text-sm">Highest Offer</p>
+    <p class="text-3xl font-bold text-orange-500">0 LPA</p>
+  </div>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="bg-white rounded-xl shadow overflow-hidden">
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+
+
+  <thead class="bg-gray-50">
+    <tr>
+      <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Student</th>
+      <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Placement</th>
+      <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Salary</th>
+      <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Status</th>
+    </tr>
+  </thead>
+
+  <tbody id="placementTableBody" class="divide-y"></tbody>
+
+</table>
+
+
+  </div>
+
+</div>
+
+</main>
+
+<!-- SCRIPT (UNCHANGED) -->
+
+<script>
+fetch("http://127.0.0.1:8000/students")
+.then(res => res.json())
+.then(data => {
+    const table = document.getElementById("placementTableBody");
+    table.innerHTML = "";
+
+    data.forEach(student => {
+        const initials = student.student_name
+            .split(" ")
+            .map(n => n[0])
+            .join("")
+            .toUpperCase();
+
+        table.innerHTML += `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                        ${initials}
+                    </div>
+                    <div>
+                        <p class="font-semibold">${student.student_name}</p>
+                        <p class="text-sm text-gray-500">${student.department}</p>
+                    </div>
+                </div>
+            </td>
+
+            <td class="px-6 py-5">
+                <p class="font-medium">${student.company_name}</p>
+                <p class="text-sm text-gray-500">${student.job_role}</p>
+            </td>
+
+            <td class="px-6 py-5 font-bold">
+                ${student.salary_lpa} LPA
+            </td>
+
+            <td class="px-6 py-5 text-right">
+                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-semibold">
+                    Placed
+                </span>
+            </td>
+        </tr>
+        `;
+    });
+});
+
+fetch("http://127.0.0.1:8000/students")
+.then(res => res.json())
+.then(data => {
+
+    document.getElementById("totalPlaced").innerText = data.length;
+
+    const avg = data.reduce((sum, s) => sum + parseFloat(s.salary_lpa), 0) / data.length;
+    document.querySelectorAll(".text-green-600")[0].innerText = avg.toFixed(1) + " LPA";
+
+    const max = Math.max(...data.map(s => s.salary_lpa));
+    document.querySelectorAll(".text-orange-500")[0].innerText = max + " LPA";
+
+});
+
+function downloadReport() {
+  window.open("http://127.0.0.1:8000/export-placements", "_blank");
+}
+</script>
+
+</body>
+</html>

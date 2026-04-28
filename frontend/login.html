@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | SCIS placements</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-headline {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Button Gradient */
+.btn-gradient {
+  background: linear-gradient(135deg, #005bbf, #1a73e8);
+}
+
+/* Card Glass Effect */
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.85);
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<!-- HEADER -->
+
+<header class="w-full bg-white shadow-sm">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-2">
+    <span class="material-symbols-outlined text-blue-600">school</span>
+    <h1 class="text-blue-700 font-bold text-lg font-headline">
+      SCIS placements
+    </h1>
+  </div>
+</header>
+
+<!-- MAIN -->
+
+<main class="flex-grow flex items-center justify-center px-4 sm:px-6 py-10 relative">
+
+  <!-- Background Blobs -->
+
+  <div class="absolute w-72 h-72 bg-blue-200 rounded-full blur-3xl opacity-20 top-[-50px] right-[-50px]"></div>
+  <div class="absolute w-72 h-72 bg-green-200 rounded-full blur-3xl opacity-20 bottom-[-50px] left-[-50px]"></div>
+
+  <!-- LOGIN CARD -->
+
+  <div class="w-full max-w-xl glass rounded-2xl shadow-lg p-9 sm:p-9 z-15">
+<!-- TITLE -->
+<div class="mb-10">
+  <h2 class="text-2xl sm:text-3xl font-bold font-headline text-gray-800">
+    Your Future Starts Here
+  </h2>
+  <p class="text-gray-500 text-sm mt-2">
+    Login to your placement portal
+  </p>
+</div>
+
+<!-- FORM -->
+<form class="space-y-8">
+
+  <!-- EMAIL -->
+  <div>
+    <label class="text-xs font-semibold text-gray-500 mb-1 block">
+      Institutional Email
+    </label>
+
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-3 text-gray-400">
+        mail
+      </span>
+
+      <input id="email" type="email"
+        class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+        placeholder="Enter your email">
+    </div>
+  </div>
+
+  <!-- PASSWORD -->
+  <div>
+    <div class="flex justify-between mb-1">
+      <label class="text-xs font-semibold text-gray-500">
+        Password
+      </label>
+      <a href="#" class="text-xs text-blue-600 hover:underline">
+        Forgot password?
+      </a>
+    </div>
+
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-3 text-gray-400">
+        lock
+      </span>
+
+      <input id="password" type="password"
+        class="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+        placeholder="Enter your password">
+    </div>
+  </div>
+
+  <!-- BUTTON -->
+  <button type="submit"
+    class="w-full btn-gradient text-white font-semibold py-3 rounded-lg shadow hover:scale-[0.98] transition">
+    Login
+  </button>
+
+</form>
+
+<!-- REGISTER -->
+<div class="mt-6 text-center border-t pt-5">
+  <p class="text-sm text-gray-500 mb-3">
+    New to the platform?
+  </p>
+
+  <a href="register.html"
+    class="block w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">
+    Register
+  </a>
+</div>
+
+  </div>
+</main>
+
+<!-- SCRIPT (UNCHANGED LOGIC) -->
+
+<script>
+const form = document.querySelector("form");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  if (!email.endsWith("@uohyd.ac.in")) {
+  alert("Invalid email domain");
+  return;
+}
+  const res = await fetch("http://127.0.0.1:8000/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  const result = await res.json();
+
+  if (result.success) {
+    localStorage.setItem("user_id", result.user_id);
+    localStorage.setItem("role", result.role);
+
+    if (result.role === "admin") {
+      window.location.href = "dashboard.html";
+    } else {
+      const profileRes = await fetch(`http://127.0.0.1:8000/profile/${result.user_id}`);
+      const profileData = await profileRes.json();
+
+      if (!profileData || Object.keys(profileData).length === 0 || profileData.error) {
+        window.location.href = "create-profile.html";
+      } else {
+        window.location.href = "home.html";
+      }
+    }
+
+  } else {
+    alert("Invalid credentials");
+  }
+});
+</script>
+
+</body>
+</html>

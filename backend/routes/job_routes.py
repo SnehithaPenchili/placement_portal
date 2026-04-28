@@ -1,0 +1,80 @@
+from fastapi import APIRouter
+from db import get_db_connection
+import uuid
+
+router = APIRouter()   #  MUST be defined BEFORE using @router
+
+# CREATE JOB
+@router.post("/jobs")
+def create_job(job: dict):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        job_id = str(uuid.uuid4())
+
+        query = """
+        INSERT INTO jobs 
+        (id, company_name, job_role, industry, salary_lpa, deadline, description, eligibility, apply_url,application_type, status)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(query, (
+            job_id,
+            job.get("company_name"),
+            job.get("job_role"),
+            job.get("industry"),
+            job.get("salary_lpa"),
+            job.get("deadline"),
+            job.get("description"),
+            job.get("eligibility"),
+            job.get("apply_url"),
+            "active"
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return {"message": "Job created successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# GET JOBS
+@router.get("/jobs")
+def get_jobs():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM jobs")
+        jobs = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jobs
+
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/admin/dashboard")
+def admin_dashboard():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT COUNT(DISTINCT company_name) AS total_companies FROM jobs")
+    total_companies = cursor.fetchone()["total_companies"]
+
+    cursor.execute("SELECT COUNT(*) AS upcoming FROM jobs WHERE deadline >= CURDATE()")
+    upcoming = cursor.fetchone()["upcoming"]
+
+    students_placed = 312  # can improve later
+
+    return {
+        "total_companies": total_companies,
+        "students_placed": students_placed,
+        "upcoming": upcoming
+    }

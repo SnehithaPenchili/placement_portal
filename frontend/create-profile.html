@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Profile</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* INPUT */
+.input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  transition: 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+/* BUTTON */
+.gradient-btn {
+  background: linear-gradient(135deg, #005bbf, #1a73e8);
+}
+</style>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="fixed top-0 w-full z-50 bg-white shadow-sm px-4 sm:px-6 py-4 flex items-center gap-4">
+  <button onclick="history.back()" class="text-blue-600 text-xl">←</button>
+  <h1 class="text-lg font-bold text-blue-600">Create Profile</h1>
+</header>
+
+<!-- MAIN -->
+
+<main class="pt-24 pb-20 px-4 sm:px-6 max-w-4xl mx-auto space-y-8">
+
+<!-- TITLE -->
+
+<div>
+  <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800">
+    Build Your Profile
+  </h2>
+  <p class="text-gray-500 mt-1 text-sm">
+    This helps companies match you better
+  </p>
+</div>
+
+<!-- FORM -->
+
+<div class="space-y-8">
+
+<!-- PERSONAL -->
+
+<div class="bg-white p-6 rounded-2xl shadow">
+  <h3 class="font-bold text-lg mb-4">Personal Details</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+
+<input id="full_name" placeholder="Full Name" class="input">
+<input id="email" placeholder="Email" class="input">
+<input id="phone" placeholder="Phone" class="input">
+<input id="address" placeholder="Address" class="input">
+
+<input id="linkedin" placeholder="LinkedIn URL" class="input sm:col-span-2">
+
+
+  </div>
+</div>
+
+<!-- ACADEMIC -->
+
+<div class="bg-white p-6 rounded-2xl shadow">
+  <h3 class="font-bold text-lg mb-4">Academic Details</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+
+<input id="university" placeholder="University" class="input">
+<input id="degree" placeholder="Degree" class="input">
+<input id="specialization" placeholder="Specialization" class="input">
+<input id="graduation_year" placeholder="Graduation Year" class="input">
+<input id="cgpa" placeholder="CGPA" class="input">
+
+<textarea id="coursework" placeholder="Coursework" class="input sm:col-span-2"></textarea>
+
+
+  </div>
+</div>
+
+<!-- SKILLS -->
+
+<div class="bg-white p-6 rounded-2xl shadow">
+  <h3 class="font-bold text-lg mb-4">Skills</h3>
+
+  <input id="skills" placeholder="Python, Java, React" class="input">
+</div>
+
+<!-- EXPERIENCE -->
+
+<div class="bg-white p-6 rounded-2xl shadow">
+  <h3 class="font-bold text-lg mb-4">Experience</h3>
+
+  <textarea id="experience" placeholder="One per line" class="input"></textarea>
+
+</div>
+
+<!-- PROJECTS -->
+
+<div class="bg-white p-6 rounded-2xl shadow">
+  <h3 class="font-bold text-lg mb-4">Projects</h3>
+
+  <textarea id="projects" placeholder="One per line" class="input"></textarea>
+
+</div>
+
+<!-- FILES -->
+
+<div class="bg-white p-6 rounded-2xl shadow">
+  <h3 class="font-bold text-lg mb-4">Resume & Profile</h3>
+
+  <div class="grid gap-4">
+    <input id="profile_image" placeholder="Profile Image URL" class="input">
+    <input id="resume_url" placeholder="Resume Link" class="input">
+  </div>
+</div>
+
+<!-- BUTTON -->
+
+<button onclick="saveProfile()"
+class="gradient-btn w-full text-white py-4 rounded-xl font-semibold text-lg shadow hover:scale-[0.98] transition">
+Save & Continue → </button>
+
+</div>
+
+</main>
+
+<!-- SCRIPT (UNCHANGED) -->
+
+<script>
+function saveProfile() {
+
+  const data = {
+    user_id: localStorage.getItem("user_id"),
+
+    full_name: full_name.value,
+    email: email.value,
+    phone: phone.value,
+    address: address.value,
+    linkedin: linkedin.value,
+
+    university: university.value,
+    degree: degree.value,
+    specialization: specialization.value,
+    graduation_year: graduation_year.value,
+    cgpa: cgpa.value,
+
+    coursework: coursework.value,
+    skills: skills.value,
+
+    experience: experience.value.split("\n"),
+    projects: projects.value.split("\n"),
+
+    resume_url: resume_url.value,
+    profile_image: profile_image.value
+  };
+
+  fetch("http://127.0.0.1:8000/profile", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Profile Saved!");
+    window.location.href = "home.html";
+  });
+}
+</script>
+
+</body>
+</html>
