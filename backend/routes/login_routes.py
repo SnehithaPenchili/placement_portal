@@ -6,20 +6,20 @@ router = APIRouter()
 @router.post("/login")
 def login(data: dict):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     email = data.get("email")
     password = data.get("password")
     #  Check in students table
     cursor.execute(
-        "SELECT * FROM students WHERE email=%s AND password=%s",
+        "SELECT * FROM students WHERE email=? AND password=?",
         (email, password)
     )
     student = cursor.fetchone()
 
     # Check in admins table
     cursor.execute(
-        "SELECT * FROM admins WHERE email=%s AND password=%s",
+        "SELECT * FROM admins WHERE email=? AND password=?",
         (email, password)
     )
     admin = cursor.fetchone()
@@ -51,8 +51,8 @@ def check_profile(user_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id FROM student_profiles WHERE user_id=%s", (user_id,))
-    result = cursor.fetchone()
+    cursor.execute("SELECT id FROM student_profiles WHERE user_id=?", (user_id,))
+    result = dict(result)
 
     cursor.close()
     conn.close()

@@ -16,7 +16,7 @@ def create_job(job: dict):
         query = """
         INSERT INTO jobs 
         (id, company_name, job_role, industry, salary_lpa, deadline, description, eligibility, apply_url,application_type, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
 
         cursor.execute(query, (
@@ -47,7 +47,7 @@ def create_job(job: dict):
 def get_jobs():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM jobs")
         jobs = cursor.fetchall()
@@ -63,12 +63,12 @@ def get_jobs():
 @router.get("/admin/dashboard")
 def admin_dashboard():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(DISTINCT company_name) AS total_companies FROM jobs")
     total_companies = cursor.fetchone()["total_companies"]
 
-    cursor.execute("SELECT COUNT(*) AS upcoming FROM jobs WHERE deadline >= CURDATE()")
+    cursor.execute("SELECT COUNT(*) AS upcoming FROM jobs WHERE deadline >= DATE('now')")
     upcoming = cursor.fetchone()["upcoming"]
 
     students_placed = 312  # can improve later

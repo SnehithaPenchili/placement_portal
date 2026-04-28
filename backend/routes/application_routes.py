@@ -15,7 +15,7 @@ def apply_job(data: dict):
     query = """
     INSERT INTO applications
     (job_id, student_name, email, phone, cgpa, resume_link)
-    VALUES (%s, %s, %s, %s, %s, %s)
+    VALUES (?, ?, ?, ?, ?, ?)
     """
     cursor.execute(query, (
         data.get("job_id"),
@@ -38,10 +38,10 @@ def apply_job(data: dict):
 @router.get("/applications/{job_id}")
 def get_applications(job_id: str):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM applications WHERE job_id=%s", (job_id,))
-    data = cursor.fetchall()
+    cursor.execute("SELECT * FROM applications WHERE job_id=?", (job_id,))
+    data = [dict(row) for row in data]
 
     cursor.close()
     conn.close()
@@ -53,10 +53,10 @@ def get_applications(job_id: str):
 @router.get("/applications/export/{job_id}")
 def export_excel(job_id: str):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM applications WHERE job_id=%s", (job_id,))
-    data = cursor.fetchall()
+    cursor.execute("SELECT * FROM applications WHERE job_id=?", (job_id,))
+    data = [dict(row) for row in data]
 
     df = pd.DataFrame(data)
 
@@ -74,11 +74,11 @@ def export_excel(job_id: str):
 @router.get("/export-placements")
 def export_placements():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     # Fetch placed students
     cursor.execute("SELECT * FROM students_placed")
-    data = cursor.fetchall()
+    data = [dict(row) for row in data]
 
     cursor.close()
     conn.close()

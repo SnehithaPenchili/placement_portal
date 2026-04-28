@@ -1,22 +1,22 @@
 from fastapi import APIRouter
 from db import get_db_connection
-    
 import json
+
 router = APIRouter()
 
-# ADD STUDENT (ADMIN)
+
+# ✅ ADD STUDENT (ADMIN)
 @router.post("/students")
 def add_student(data: dict):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        query = """
-        INSERT INTO students_placed (student_name, company_name, job_role, salary_lpa,department)
-        VALUES (%s, %s, %s, %s,%s)
-        """
-
-        cursor.execute(query, (
+        cursor.execute("""
+            INSERT INTO students_placed 
+            (student_name, company_name, job_role, salary_lpa, department)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
             data.get("student_name"),
             data.get("company_name"),
             data.get("job_role"),
@@ -25,7 +25,6 @@ def add_student(data: dict):
         ))
 
         conn.commit()
-        cursor.close()
         conn.close()
 
         return {"message": "Student added successfully"}
@@ -39,120 +38,124 @@ def add_student(data: dict):
 def get_students():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM students_placed ORDER BY salary_lpa DESC")
-        data = cursor.fetchall()
+        rows = cursor.fetchall()
 
-        cursor.close()
+        data = [dict(row) for row in rows]
+
         conn.close()
 
         return data
 
     except Exception as e:
         return {"error": str(e)}
-@router.get("/students")
-def get_students():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM students_placed")
-        students = cursor.fetchall()
 
-        cursor.close()
-        conn.close()
-
-        return students
-
-    except Exception as e:
-        return {"error": str(e)}
-    
+# ✅ GET SINGLE STUDENT PROFILE
 @router.get("/students/{user_id}")
 def get_student(user_id: int):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM student_profiles WHERE user_id=%s", (user_id,))
-    student = cursor.fetchone()
+    cursor.execute("SELECT * FROM student_profiles WHERE user_id=?", (user_id,))
+    row = cursor.fetchone()
 
-    cursor.close()
     conn.close()
 
-    return student
+    return dict(row) if row else {"error": "Not found"}
 
 
+# ✅ GET PROFILE
 @router.get("/profile/{user_id}")
 def get_profile(user_id: int):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT * FROM student_profiles WHERE user_id=%s",
+        "SELECT * FROM student_profiles WHERE user_id=?",
         (user_id,)
     )
 
-    profile = cursor.fetchone()
+    row = cursor.fetchone()
 
-    cursor.close()
     conn.close()
 
-    if profile:
-        return profile
-    else:
-        return {"error": "Profile not found"}
+    return dict(row) if row else {"error": "Profile not found"}
 
+
+# ✅ SAVE / UPDATE PROFILE (SQLite FIX)
 @router.post("/profile")
 def save_profile(data: dict):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    query = """
-    INSERT INTO student_profiles 
-    (user_id, full_name, email, phone, address, linkedin,
-     university, degree, specialization, graduation_year, cgpa, coursework,
-     skills, experience, projects, resume_url,profile_image)
+    # 🔥 Check if profile exists
+    cursor.execute(
+        "SELECT * FROM student_profiles WHERE user_id=?",
+        (data["user_id"],)
+    )
+    existing = cursor.fetchone()
 
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    if existing:
+        # ✅ UPDATE
+        cursor.execute("""
+            UPDATE student_profiles SET
+            full_name=?, email=?, phone=?, address=?, linkedin=?,
+            university=?, degree=?, specialization=?, graduation_year=?,
+            cgpa=?, coursework=?, skills=?, experience=?, projects=?,
+            resume_url=?, profile_image=?
+            WHERE user_id=?
+        """, (
+            data["full_name"],
+            data["email"],
+            data["phone"],
+            data["address"],
+            data["linkedin"],
+            data["university"],
+            data["degree"],
+            data["specialization"],
+            data["graduation_year"],
+            data["cgpa"],
+            data["coursework"],
+            data["skills"],
+            json.dumps(data["experience"]),
+            json.dumps(data["projects"]),
+            data["resume_url"],
+            data["profile_image"],
+            data["user_id"]
+        ))
 
-    ON DUPLICATE KEY UPDATE
-    full_name=%s, phone=%s, address=%s, linkedin=%s,
-    degree=%s, cgpa=%s, skills=%s, experience=%s, projects=%s,profile_image="%s"
-    """
-
-    cursor.execute(query, (
-        data["user_id"],
-        data["full_name"],
-        data["email"],
-        data["phone"],
-        data["address"],
-        data["linkedin"],
-        data["university"],
-        data["degree"],
-        data["specialization"],
-        data["graduation_year"],
-        data["cgpa"],
-        data["coursework"],
-        data["skills"],
-        json.dumps(data["experience"]),
-        json.dumps(data["projects"]),
-        data["resume_url"],
-        data["profile_image"],
-
-        data["full_name"],
-        data["phone"],
-        data["address"],
-        data["linkedin"],
-        data["degree"],
-        data["cgpa"],
-        data["skills"],
-        json.dumps(data["experience"]),
-        json.dumps(data["projects"]),
-        data["profile_image"] 
-    ))
+    else:
+        # ✅ INSERT
+        cursor.execute("""
+            INSERT INTO student_profiles 
+            (user_id, full_name, email, phone, address, linkedin,
+             university, degree, specialization, graduation_year, cgpa,
+             coursework, skills, experience, projects, resume_url, profile_image)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data["user_id"],
+            data["full_name"],
+            data["email"],
+            data["phone"],
+            data["address"],
+            data["linkedin"],
+            data["university"],
+            data["degree"],
+            data["specialization"],
+            data["graduation_year"],
+            data["cgpa"],
+            data["coursework"],
+            data["skills"],
+            json.dumps(data["experience"]),
+            json.dumps(data["projects"]),
+            data["resume_url"],
+            data["profile_image"]
+        ))
 
     conn.commit()
-    cursor.close()
     conn.close()
 
     return {"message": "Profile saved"}

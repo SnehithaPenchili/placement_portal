@@ -16,7 +16,7 @@ def register(data: dict):
         cursor = conn.cursor()
 
         # 2. CHECK IF EMAIL EXISTS
-        cursor.execute("SELECT * FROM students WHERE email=%s", (email,))
+        cursor.execute("SELECT * FROM students WHERE email=?", (email,))
         existing_user = cursor.fetchone()
 
         if existing_user:
@@ -25,7 +25,7 @@ def register(data: dict):
         #3. INSERT
         query = """
         INSERT INTO students (full_name, email, password, college)
-        VALUES (%s, %s, %s, %s)
+        VALUES (?, ?, ?, ?)
         """
 
         cursor.execute(query, (
