@@ -11,16 +11,13 @@ def create_job(job: dict):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        job_id = str(uuid.uuid4())
-
         query = """
         INSERT INTO jobs 
-        (id, company_name, job_role, industry, salary_lpa, deadline, description, eligibility, apply_url,application_type, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+        (company_name, job_role, industry, salary_lpa, deadline, description, eligibility, apply_url,application_type, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         """
 
         cursor.execute(query, (
-            job_id,
             job.get("company_name"),
             job.get("job_role"),
             job.get("industry"),
