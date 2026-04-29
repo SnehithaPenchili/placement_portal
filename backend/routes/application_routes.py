@@ -3,7 +3,7 @@ from db import get_db_connection
 import pandas as pd
 from fastapi.responses import FileResponse
 import os
-
+import sqlite3
 router = APIRouter()
 
 #  APPLY JOB
@@ -56,7 +56,15 @@ def export_excel(job_id: str):
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM applications WHERE job_id=?", (job_id,))
-    data = [dict(row) for row in data]
+    rows = cursor.fetchall()   #  FIX
+
+    data = [dict(row) for row in rows]   #  FIX
+
+    cursor.close()
+    conn.close()
+
+    if not data:
+        return {"error": "No applications found"}
 
     df = pd.DataFrame(data)
 
@@ -76,9 +84,10 @@ def export_placements():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Fetch placed students
     cursor.execute("SELECT * FROM students_placed")
-    data = [dict(row) for row in data]
+    rows = cursor.fetchall()   # ✅ FIX
+
+    data = [dict(row) for row in rows]   # ✅ FIX
 
     cursor.close()
     conn.close()
@@ -86,10 +95,8 @@ def export_placements():
     if not data:
         return {"error": "No data found"}
 
-    # Convert to DataFrame
     df = pd.DataFrame(data)
 
-    # Save file
     file_path = "placements_report.xlsx"
     df.to_excel(file_path, index=False)
 
