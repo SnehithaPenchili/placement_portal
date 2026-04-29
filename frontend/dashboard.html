@@ -272,7 +272,7 @@ if (!userId) {
 </script>
 <script>
 async function loadJobs() {
-  const res = await fetch("http://127.0.0.1:8000/jobs");
+  const res = await fetch("https://placement-portal-8ey5.onrender.com/jobs");
   const jobs = await res.json();
 
   const container = document.getElementById("drivesContainer");
@@ -354,7 +354,7 @@ function logout() {
 <script>
 async function loadDashboard() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/admin/dashboard");
+    const res = await fetch("https://placement-portal-8ey5.onrender.com/admin/dashboard");
     const data = await res.json();
 
     console.log("Dashboard:", data);

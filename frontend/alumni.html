@@ -78,7 +78,7 @@ body {
 <script>
 async function loadAlumni() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/students");
+    const res = await fetch("https://placement-portal-8ey5.onrender.com/students");
     const data = await res.json();
 
     displayAlumni(data);

@@ -133,7 +133,7 @@ h1,h2 { font-family: 'Manrope', sans-serif; }
 <!-- SCRIPT (UNCHANGED) -->
 
 <script>
-fetch("http://127.0.0.1:8000/students")
+fetch("https://placement-portal-8ey5.onrender.com/students")
 .then(res => res.json())
 .then(data => {
     const table = document.getElementById("placementTableBody");
@@ -179,7 +179,7 @@ fetch("http://127.0.0.1:8000/students")
     });
 });
 
-fetch("http://127.0.0.1:8000/students")
+fetch("https://placement-portal-8ey5.onrender.com/students")
 .then(res => res.json())
 .then(data => {
 
@@ -194,7 +194,7 @@ fetch("http://127.0.0.1:8000/students")
 });
 
 function downloadReport() {
-  window.open("http://127.0.0.1:8000/export-placements", "_blank");
+  window.open("https://placement-portal-8ey5.onrender.com/export-placements", "_blank");
 }
 </script>
 

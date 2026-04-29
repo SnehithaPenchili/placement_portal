@@ -183,7 +183,7 @@ function saveProfile() {
     profile_image: profile_image.value
   };
 
-  fetch("http://127.0.0.1:8000/profile", {
+  fetch("https://placement-portal-8ey5.onrender.com/profile", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(data)

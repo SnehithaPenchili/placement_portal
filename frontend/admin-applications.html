@@ -76,7 +76,7 @@ const jobId = new URLSearchParams(window.location.search).get("job_id");
 
 async function loadApplicants() {
 
-  const res = await fetch(`http://127.0.0.1:8000/applications/${jobId}`);
+  const res = await fetch(`https://placement-portal-8ey5.onrender.com/applications/${jobId}`);
   const data = await res.json();
 
   document.getElementById("count").innerText = data.length;
@@ -120,7 +120,7 @@ async function loadApplicants() {
 }
 
 function downloadExcel() {
-  window.open(`http://127.0.0.1:8000/applications/export/${jobId}`);
+  window.open(`https://placement-portal-8ey5.onrender.com/applications/export/${jobId}`);
 }
 
 loadApplicants();

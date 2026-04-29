@@ -161,7 +161,7 @@ async function loadProfile(){
     return;
   }
 
-  const res = await fetch(`http://127.0.0.1:8000/profile/${userId}`);
+  const res = await fetch(`https://placement-portal-8ey5.onrender.com/profile/${userId}`);
   const data = await res.json();
 
   console.log("PROFILE:", data);
