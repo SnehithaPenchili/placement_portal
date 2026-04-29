@@ -43,8 +43,7 @@ CREATE TABLE IF NOT EXISTS student_profiles (
     experience TEXT,
     projects TEXT,
     resume_url TEXT,
-    profile_image TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    profile_image TEXT
 )
 """)
 
@@ -73,8 +72,7 @@ CREATE TABLE IF NOT EXISTS applications (
     email TEXT,
     phone TEXT,
     cgpa REAL,
-    resume_link TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    resume_link TEXT
 )
 """)
 
