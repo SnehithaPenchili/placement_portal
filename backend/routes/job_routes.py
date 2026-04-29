@@ -16,7 +16,7 @@ def create_job(job: dict):
         query = """
         INSERT INTO jobs 
         (id, company_name, job_role, industry, salary_lpa, deadline, description, eligibility, apply_url,application_type, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         """
 
         cursor.execute(query, (
@@ -29,6 +29,7 @@ def create_job(job: dict):
             job.get("description"),
             job.get("eligibility"),
             job.get("apply_url"),
+            job.get("application_type"),
             "active"
         ))
 
